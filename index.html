@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>City Life – Explore, compare, stay safe</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#eef2f1;--card:#fff;--ink:#14232b;--mut:#5b6b72;--line:#d5dedd;--acc:#0f766e;--risk:#d9480f;--route:#1d4ed8;--map:#e3ebe8;--water:#bcd7e6;--road:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root:not([data-theme="light"]){}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1a1f;--card:#16262d;--ink:#e6eeee;--mut:#9ab0b6;--line:#26404a;--acc:#2dd4bf;--risk:#fb923c;--route:#7aa2ff;--map:#14262d;--water:#1f4152;--road:#223b45}}
+:root[data-theme="dark"]{--bg:#0e1a1f;--card:#16262d;--ink:#e6eeee;--mut:#9ab0b6;--line:#26404a;--acc:#2dd4bf;--risk:#fb923c;--route:#7aa2ff;--map:#14262d;--water:#1f4152;--road:#223b45}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Inter,system-ui,sans-serif}
+h1,h2,h3{font-family:'Bricolage Grotesque',Inter,sans-serif;margin:0}
+header{padding:14px 16px 0;max-width:1200px;margin:auto}
+.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline}
+h1{font-size:26px}.sub{color:var(--mut);font-size:13px}
+.strip{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.strip span{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:4px 12px;font-size:13px}
+.strip .warn{border-color:var(--risk);color:var(--risk)}
+nav{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line)}
+nav button{background:none;border:0;padding:10px 14px;font:600 14px Inter;color:var(--mut);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+nav button.on{color:var(--ink);border-color:var(--acc)}
+main{max-width:1200px;margin:auto;padding:14px 16px 30px;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,1fr);gap:16px}
+@media(max-width:820px){main{grid-template-columns:1fr}}
+.mapwrap{background:var(--map);border:1px solid var(--line);border-radius:14px;overflow:hidden;position:sticky;top:8px;align-self:start}
+@media(max-width:820px){.mapwrap{position:static}}
+svg{display:block;width:100%;height:auto;max-height:78vh}
+.legend{display:flex;gap:10px;flex-wrap:wrap;padding:8px 12px;font-size:12px;color:var(--mut);background:var(--card);border-top:1px solid var(--line)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px}
+.panel{display:flex;flex-direction:column;gap:12px;min-width:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
+input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:20px;padding:5px 12px;cursor:pointer;font:500 13px Inter}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn{background:var(--acc);color:#fff;border:0;border-radius:8px;padding:10px 14px;font:600 14px Inter;cursor:pointer}
+.btn.alt{background:none;color:var(--ink);border:1px solid var(--line)}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between}
+.item{display:flex;gap:10px;align-items:center;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);cursor:pointer;text-align:left;width:100%;color:var(--ink);font:inherit}
+.item.on{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc)}
+.dot{width:11px;height:11px;border-radius:50%;flex:none}
+.score{font:700 16px 'Bricolage Grotesque';min-width:34px;text-align:right}
+.bar{height:7px;background:var(--line);border-radius:4px;overflow:hidden}.bar b{display:block;height:100%}
+.m{display:grid;grid-template-columns:96px 1fr 30px;gap:8px;align-items:center;font-size:13px;margin:5px 0}
+.big{font:700 40px/1 'Bricolage Grotesque'}
+.mut{color:var(--mut);font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left}td.best{font-weight:700;color:var(--acc)}
+.wrap{overflow-x:auto}
+.tag{display:inline-block;border:1px solid var(--line);border-radius:6px;padding:1px 7px;font-size:12px;margin:2px 3px 0 0}
+.ok{color:var(--acc);font-weight:600}.no{color:var(--risk);font-weight:600}
+label{font-size:13px;font-weight:600;display:block;margin:8px 0 4px}
+.landing{display:block}.landing .mapwrap{display:none}.landing .panel{max-width:960px;margin:auto}
+.hero{background:var(--ink);color:var(--bg);border-radius:14px;padding:28px 24px}.hero h1{font-size:38px}.hero h2{font-size:22px;line-height:1.2;margin:8px 0;max-width:640px}.hero p{margin:6px 0 16px;opacity:.85;max-width:620px}
+.hero .btn{background:var(--bg);color:var(--ink)}.hero .btn.alt{background:none;color:var(--bg);border:1px solid var(--bg)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}.stat b{display:block;font:700 26px 'Bricolage Grotesque'}.stat span{font-size:12px;color:var(--mut)}
+.feats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.feats,.steps{grid-template-columns:1fr}.hero h1{font-size:30px}}
+@keyframes up{from{opacity:0;transform:translateY(12px)}}
+@keyframes pop{from{opacity:0;transform:scale(.1)}}
+@keyframes grow{from{width:0}}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes pulse{50%{opacity:.45}}
+#panel.anim>*{animation:up .45s cubic-bezier(.2,.7,.3,1) backwards}
+#panel.anim>*:nth-child(2){animation-delay:.07s}#panel.anim>*:nth-child(3){animation-delay:.14s}#panel.anim>*:nth-child(4){animation-delay:.21s}#panel.anim>*:nth-child(5){animation-delay:.28s}#panel.anim>*:nth-child(n+6){animation-delay:.35s}
+#map.anim g[data-id]{transform-box:fill-box;transform-origin:center;animation:pop .45s cubic-bezier(.2,1.5,.4,1) backwards;animation-delay:var(--d)}
+#map.anim .rl{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1s ease .1s forwards}
+.anim .bar b{animation:grow .8s cubic-bezier(.2,.7,.3,1) backwards}
+.hz{animation:pulse 3.2s ease-in-out infinite}
+.item,.chip,.btn{transition:transform .15s,box-shadow .15s,background .15s}.item:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(0,0,0,.08)}.btn:hover,.chip:hover{transform:translateY(-1px)}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.rl{stroke-dasharray:none!important;stroke-dashoffset:0!important}}
+</style></head><body>
+<header>
+ <div class="top"><div><h1>City Life</h1><div class="sub">Explore, compare and stay safe. <span id="cnote">Sample data for the MVP.</span></div></div>
+ <span><select id="city" aria-label="Choose city" style="width:auto;margin-right:8px"></select><button class="chip" id="theme">Toggle theme</button></span></div>
+ <div class="strip"><span>29°C, humid</span><span class="warn">Rain likely after 5 PM</span><span class="warn">Heavy traffic: Station Road</span><span class="mut" style="border:0;background:none">Weather and traffic are simulated</span></div>
+ <nav id="nav"></nav>
+</header>
+<main><div class="mapwrap"><div id="map"></div><div class="legend" id="legend"></div></div><div class="panel" id="panel"></div></main>
+<script>
+const CAT={food:['Food','#b45309'],stay:['Stay','#7c3aed'],sight:['Sights','#0e7490'],heritage:['Heritage','#9a3412']};
+const W={s:.30,c:.20,a:.20,r:.15,x:.15},LBL={s:'Safety',c:'Cleanliness',a:'Affordability',r:'Rating',x:'Accessibility'};
+let P=[
+[1,'Citadel Fort','heritage',18,16,[78,70,80,86,60],'Hill fort built by the old city rulers. Sunrise views over the river.',['history','views']],
+[2,'Old Town Thali House','food',30,38,[70,66,92,88,75],'Family-run thali place, lunch rush at 1 PM.',['budget','local food']],
+[3,'Spice Lane Chaat Stall','food',40,28,[64,50,96,84,70],'Street snacks lane, great value but busy.',['budget','crowded']],
+[4,'Heritage Stepwell','heritage',12,48,[72,74,95,80,50],'Stone stepwell with carved arches, free entry. Rough path to reach it.',['history','free']],
+[5,'Riverside Café','food',52,50,[84,88,60,90,85],'Calm café on the river walk. Good for evenings.',['clean','quiet']],
+[6,'Central Station Lodge','stay',68,26,[48,55,85,62,95],'Cheap rooms next to the station. Noisy and poorly lit at night.',['budget','noisy']],
+[7,'Market Square Hostel','stay',44,64,[70,78,88,82,80],'Social hostel close to markets and buses.',['budget','social']],
+[8,'Grand Palace Hotel','stay',80,52,[92,94,30,91,90],'Premium hotel with 24x7 security.',['luxury','safe']],
+[9,'City Museum','sight',58,14,[88,90,75,87,88],'Art and local history galleries. Closed Mondays.',['culture','indoor']],
+[10,'Lakeview Garden','sight',74,76,[80,72,98,78,65],'Free garden with a walking loop. Best before sunset.',['free','outdoor']],
+[11,'Night Bazaar','sight',30,72,[52,45,90,79,72],'Lively evening market. Watch your belongings.',['crowded','shopping']],
+[12,'Tech Park Food Court','food',88,22,[86,85,70,76,82],'Clean, quick lunches with many options.',['clean','quick']],
+[13,'Old Temple Complex','heritage',20,62,[82,80,98,89,68],'Centuries-old temple with an annual lantern festival.',['tradition','free']],
+[14,'Harbor Gate Grill','food',56,86,[66,70,65,81,60],'Seafood grill beside a busy junction.',['seafood','traffic']],
+[15,'Riverfront Promenade','sight',44,48,[85,80,98,84,90],'Paved walk along the river with benches and lights.',['free','walk']],
+[16,'Sunrise Bakery','food',24,52,[74,82,85,86,70],'Fresh bread and chai from 6 AM.',['breakfast','budget']],
+[17,'Pearl Boutique Hotel','stay',34,22,[88,90,55,89,78],'Restored townhouse hotel with a quiet courtyard.',['safe','quiet']],
+[18,'Textile Museum','heritage',8,30,[76,80,72,80,70],'Hand-block printing and weaving traditions, with live demos.',['craft','culture']],
+[19,'Street Food Alley','food',70,60,[60,52,97,85,65],'Evening stalls with local snacks. Busy after 7 PM.',['budget','crowded']],
+[20,'Botanical Park','sight',84,88,[84,86,99,83,75],'Large shaded park with a lake and cycle track.',['free','outdoor']],
+[21,'Bus Terminal Dhaba','food',78,36,[58,48,93,70,85],'Cheap and fast meals next to the bus terminal.',['budget','late-night']],
+[22,'Backpackers Nest','stay',14,80,[68,74,92,80,60],'Dorm beds and a rooftop common room.',['budget','social']],
+[23,'Clock Tower','heritage',40,12,[86,84,98,85,80],'19th-century clock tower at the old market gate.',['history','free']],
+[24,'Skyline Rooftop Grill','food',62,58,[78,86,35,88,88],'Rooftop dining with city views. Pricey.',['views','premium']],
+[25,'Craft Market','sight',50,40,[72,66,85,80,78],'Handicraft stalls, best on weekend mornings.',['shopping','local']]
+].map(a=>({id:a[0],name:a[1],cat:a[2],x:a[3],y:a[4],b:{s:a[5][0],c:a[5][1],a:a[5][2],r:a[5][3],x:a[5][4]},blurb:a[6],tags:a[7]}));
+let E=[[1,2],[2,3],[2,4],[4,13],[13,11],[2,5],[3,6],[3,9],[9,6],[9,12],[6,12],[6,8],[5,6],[5,7],[5,8],[7,11],[7,14],[11,14],[14,10],[8,10],[23,3],[23,9],[17,2],[17,23],[18,1],[18,4],[16,4],[16,2],[15,5],[15,2],[25,3],[25,15],[19,8],[19,24],[24,5],[24,19],[20,10],[21,6],[21,12],[22,13],[22,11]];
+const N=()=>P,EE=()=>E;
+let Z=[{x:60,y:40,r:14,w:.9,n:'Station Road underpass',why:'Poor lighting, snatching reports'},{x:36,y:62,r:12,w:.7,n:'Night Bazaar lane',why:'Crowding, pickpocket reports'},{x:66,y:70,r:12,w:.8,n:'Harbor Gate junction',why:'Accident-prone, no crossing'}];
+const STORY=[['Citadel Fort','Built to watch the river trade, its gates still close each evening.'],['Heritage Stepwell','Stepwells stored monsoon water and were also community meeting spots.'],['Old Temple Complex','Lantern festival each autumn lights the whole complex.']];
+let R=[
+{id:1,cat:'Poor lighting',text:'Streetlights out under the station underpass.',x:61,y:42,hrs:3,votes:6},
+{id:2,cat:'Poor lighting',text:'Very dark near the underpass after 9 PM.',x:58,y:39,hrs:20,votes:3},
+{id:3,cat:'Accident',text:'Two-wheeler collision at Harbor Gate signal.',x:66,y:69,hrs:5,votes:8},
+{id:4,cat:'Garbage',text:'Overflowing bins behind Night Bazaar.',x:34,y:70,hrs:30,votes:2},
+{id:5,cat:'Theft',text:'Phone snatched near bazaar entrance.',x:37,y:60,hrs:10,votes:4}];
+const S={anim:true,city:'pune',cname:'Pune',tab:'home',cat:'all',q:'',sel:null,cmp:[2,5],heat:false,from:1,to:8,pin:null,res:null,rid:6};
+const $=id=>document.getElementById(id),pl=id=>P.find(p=>p.id==id);
+const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+function conf(r){const n=R.filter(o=>o!==r&&o.cat===r.cat&&Math.hypot(o.x-r.x,o.y-r.y)<10).length;return Math.min(100,Math.round(25+n*18+r.votes*4+Math.max(0,20-r.hrs*.7)))}
+const zs=()=>[...Z,...R.map(r=>({x:r.x,y:r.y,r:9,w:.15+.45*conf(r)/100}))];
+function inten(x,y){let t=0;zs().forEach(z=>{t+=z.w*Math.max(0,1-Math.hypot(x-z.x,y-z.y)/z.r)});return Math.min(1,t)}
+function sc(p){const b={...p.b};b.s=Math.round(b.s*(1-.5*inten(p.x,p.y)));const t=Math.round(Object.keys(W).reduce((s,k)=>s+b[k]*W[k],0));return{...b,t}}
+const col=v=>v>=75?'#15803d':v>=55?'#ca8a04':'#d9480f';
+function eRisk(a,b){let t=0;for(let i=0;i<=8;i++)t+=inten(a.x+(b.x-a.x)*i/8,a.y+(b.y-a.y)*i/8);return t/9}
+function route(f,t,safe){const d={},prev={},seen={};N().forEach(p=>d[p.id]=1e9);d[f]=0;
+ for(;;){let u=null;N().forEach(p=>{if(!seen[p.id]&&(u===null||d[p.id]<d[u]))u=p.id});if(u===null||d[u]>=1e9||u==t)break;seen[u]=1;
+  EE().forEach(([a,b])=>{let v=a==u?b:b==u?a:null;if(v===null)return;const A=pl(u),B=pl(v),c=dist(A,B)*(safe?1+7*eRisk(A,B):1);if(d[u]+c<d[v]){d[v]=d[u]+c;prev[v]=u}})}
+ const path=[t];while(path[0]!=f&&prev[path[0]]!==undefined)path.unshift(prev[path[0]]);let len=0,ex=0;
+ for(let i=0;i<path.length-1;i++){const A=pl(path[i]),B=pl(path[i+1]),l=dist(A,B);len+=l;ex+=l*eRisk(A,B)}
+ return{path,km:(len*.12).toFixed(1),min:Math.round(len*.12/20*60),safety:Math.round(100*(1-Math.min(1,ex/len*1.6)))}}
+function summary(p){const s=sc(p),ks=Object.keys(LBL).map(k=>k).sort((a,b)=>s[b]-s[a]);
+ const adv=s.s<60?'Avoid after 9 PM or go in a group.':s.s<75?'Fine in daytime; stay alert at night.':'Safe at most hours.';
+ return `Best for ${LBL[ks[0]].toLowerCase()} and ${LBL[ks[1]].toLowerCase()}. Weakest on ${LBL[ks[4]].toLowerCase()}. ${adv}`}
+function nearReports(p){return R.filter(r=>Math.hypot(r.x-p.x,r.y-p.y)<14)}
+function shown(){return P.filter(p=>(S.cat==='all'||p.cat===S.cat)&&p.name.toLowerCase().includes(S.q.toLowerCase()))}
+function bars(s){return Object.keys(LBL).map(k=>`<div class="m"><span>${LBL[k]}</span><div class="bar"><b style="width:${s[k]}%;background:${col(s[k])}"></b></div><b>${s[k]}</b></div>`).join('')}
+/* MAP */
+function mapSvg(){let g=`<svg viewBox="0 0 100 100" id="svg" role="img" aria-label="Map of ${S.cname}"><defs><radialGradient id="hg"><stop offset="0" stop-color="#d9480f" stop-opacity=".6"/><stop offset="1" stop-color="#d9480f" stop-opacity="0"/></radialGradient></defs>
+<rect width="100" height="100" fill="var(--map)"/><path d="M0 40 C25 30 40 55 60 45 S90 40 100 48 L100 56 C90 50 70 52 60 52 S25 38 0 48Z" fill="var(--water)" opacity=".8"/>`;
+ EE().forEach(([a,b])=>{const A=pl(a),B=pl(b);g+=`<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="var(--road)" stroke-width="1.6" stroke-linecap="round"/>`});
+ if(S.heat||S.tab==='safety')zs().forEach(z=>g+=`<circle class="hz" cx="${z.x}" cy="${z.y}" r="${z.r}" fill="url(#hg)"/>`);
+ if(S.tab==='safety')R.forEach(r=>g+=`<path d="M${r.x} ${r.y-2.2}l2 3.6h-4z" fill="#d9480f" stroke="#fff" stroke-width=".4"><title>${r.cat}: ${r.text}</title></path>`);
+ if(S.tab==='route'&&S.res){[[S.res.fast,'#64748b',''],[S.res.safe,'var(--route)','']].forEach(([r,c],i)=>{const pts=r.path.map(id=>pl(id).x+','+pl(id).y).join(' ');g+=`<polyline points="${pts}" fill="none" stroke="${c}" stroke-width="${i?1.6:1.2}" stroke-dasharray="${i?'':'2 1.4'}" ${i?'pathLength="1" class="rl"':''} stroke-linecap="round" stroke-linejoin="round"/>`})}
+ const list=P;
+ list.forEach(p=>{const dim=(S.tab==='explore'&&!shown().includes(p))||(S.tab==='heritage'&&p.cat!=='heritage');const on=S.sel==p.id||(S.tab==='compare'&&S.cmp.includes(p.id))||(S.tab==='route'&&(p.id==S.from||p.id==S.to));
+  g+=`<g data-id="${p.id}" style="cursor:pointer;--d:${P.indexOf(p)*30}ms" opacity="${dim?.2:1}"><circle cx="${p.x}" cy="${p.y}" r="${on?3.4:2.5}" fill="${CAT[p.cat][1]}" stroke="${on?'var(--ink)':'#fff'}" stroke-width=".7"/><title>${p.name}</title>${on?`<text x="${p.x}" y="${p.y-4.2}" font-size="2.8" text-anchor="middle" fill="var(--ink)" font-weight="600" paint-order="stroke" stroke="var(--map)" stroke-width=".8">${p.name}</text>`:''}</g>`});
+ if(S.pin)g+=`<path d="M${S.pin.x} ${S.pin.y}l-2-4.5a2.4 2.4 0 1 1 4 0z" fill="#d9480f" stroke="#fff" stroke-width=".4"/>`;
+ return g+'</svg>'}
+function legend(){return ''+Object.values(CAT).map(c=>`<span><i style="background:${c[1]}"></i>${c[0]}</span>`).join('')+(S.tab==='route'?'<span>Dashed grey: fastest</span><span style="color:var(--route)">Blue: safest</span>':'')+(S.tab==='safety'||S.heat?'<span style="color:var(--risk)">Red glow: reported risk</span>':'')+(S.tab==='report'?'<span>Click the map to drop a pin</span>':'')}
+/* PANELS */
+function detail(p){const s=sc(p),nr=nearReports(p);return `<div class="card"><div class="row"><div><h2>${p.name}</h2><span class="mut">${CAT[p.cat][0]}</span></div><div style="text-align:right"><div class="big" style="color:${col(s.t)}">${s.t}</div><div class="mut">City Score</div></div></div>
+<p>${p.blurb}</p>${bars(s)}<p><b>AI summary:</b> ${summary(p)}</p><div>${p.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+<p class="mut">${nr.length?nr.length+' citizen report(s) within range lower the safety score.':'No recent reports nearby.'}</p>
+<div class="row" style="flex-wrap:wrap"><button class="btn alt" data-a="cmp" data-v="${p.id}">Add to compare</button><button class="btn" data-a="routeto" data-v="${p.id}">Route here</button></div></div>`}
+function pExplore(){const l=shown().map(p=>({p,t:sc(p).t})).sort((a,b)=>b.t-a.t);
+ return `<input id="q" placeholder="Search places" value="${S.q}" aria-label="Search places"><div class="chips">${['all',...Object.keys(CAT)].map(c=>`<button class="chip ${S.cat===c?'on':''}" data-a="cat" data-v="${c}">${c==='all'?'All':CAT[c][0]}</button>`).join('')}</div>
+<label class="row" style="margin:0"><span>Show safety layer</span><input type="checkbox" data-a="heat" ${S.heat?'checked':''} style="width:auto"></label>
+${S.sel?detail(pl(S.sel)):'<div class="card mut">Select a place on the map or list to see its City Score.</div>'}
+${l.length?l.map(o=>item(o.p,o.t)).join(''):'<div class="card mut">No places match. Clear the search or pick another category.</div>'}`}
+function item(p,t){return `<button class="item ${S.sel==p.id?'on':''}" data-a="sel" data-v="${p.id}"><span class="dot" style="background:${CAT[p.cat][1]}"></span><span style="flex:1">${p.name}<br><span class="mut">${CAT[p.cat][0]}</span></span><span class="score" style="color:${col(t)}">${t}</span></button>`}
+function pCompare(){const all=P.map(p=>({p,s:sc(p)})).sort((a,b)=>b.s.t-a.s.t),c=S.cmp.map(pl).filter(Boolean);
+ const rows=[...Object.keys(LBL),'t'].map(k=>{const mx=Math.max(...c.map(p=>sc(p)[k]));return `<tr><th>${k==='t'?'City Score':LBL[k]}</th>${c.map(p=>`<td class="${sc(p)[k]==mx&&c.length>1?'best':''}">${sc(p)[k]}</td>`).join('')}</tr>`}).join('');
+ return `<div class="card"><h3>Compare places</h3><p class="mut">Pick up to 3 on the map or below. Best value in each row is highlighted.</p>${c.length?`<div class="wrap"><table><tr><th></th>${c.map(p=>`<th>${p.name}</th>`).join('')}</tr>${rows}</table></div>`:'<p class="mut">Nothing selected yet.</p>'}</div>
+<div class="card"><h3>Top 5</h3>${all.slice(0,5).map(o=>item(o.p,o.s.t)).join('')}</div><div class="card"><h3>Bottom 5</h3>${all.slice(-5).reverse().map(o=>item(o.p,o.s.t)).join('')}</div>`}
+function pSafety(){const zl=Z.map(z=>({...z,rs:R.filter(r=>Math.hypot(r.x-z.x,r.y-z.y)<z.r).length}));
+ return `<div class="card"><h3>Risk zones</h3><p class="mut">The red glow combines known hotspots with verified citizen reports.</p>${zl.map(z=>`<div style="padding:8px 0;border-bottom:1px solid var(--line)"><div class="row"><b>${z.n}</b><span class="no">${Math.round(100-z.w*100)}/100 safety</span></div><span class="mut">${z.why}. ${z.rs} report(s) nearby.</span></div>`).join('')}</div>
+<div class="card"><h3>Safest places</h3>${P.map(p=>({p,s:sc(p).s})).sort((a,b)=>b.s-a.s).slice(0,4).map(o=>item(o.p,o.s)).join('')}</div>`}
+function pRoute(){const op=P.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');const r=S.res;
+ const rc=(t,x,c)=>`<div class="card" style="border-left:4px solid ${c}"><div class="row"><b>${t}</b><span>${x.min} min · ${x.km} km</span></div><div class="row"><span class="mut">${x.path.map(id=>pl(id).name).join(' → ')}</span><span class="score" style="color:${col(x.safety)}">${x.safety}</span></div></div>`;
+ return `<div class="card"><h3>Plan a route</h3><label for="from">From</label><select id="from">${op}</select><label for="to">To</label><select id="to">${op}</select><div style="margin-top:12px"><button class="btn" data-a="go">Compare routes</button></div></div>
+${r?rc('Fastest',r.fast,'#64748b')+rc('Safest',r.safe,'var(--route)')+`<p class="mut">${r.safe.path.join()===r.fast.path.join()?'The fastest route is already the safest here.':`Safest route takes ${r.safe.min-r.fast.min} more min and raises the safety score from ${r.fast.safety} to ${r.safe.safety}.`} Score on the right is route safety (0–100).</p>`:'<div class="card mut">Choose two places, then compare fastest and safest routes.</div>'}`}
+function pHeritage(){const h=P.filter(p=>p.cat==='heritage');return `<div class="card"><h3>Heritage trail</h3><p class="mut">A walkable trail through the oldest parts of the city.</p></div>${h.map(p=>`<div class="card"><h3>${p.name}</h3><p>${p.blurb}</p><p class="mut">${(STORY.find(s=>s[0]===p.name)||[,''])[1]}</p><div class="row"><span>${p.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</span><button class="btn alt" data-a="sel" data-v="${p.id}">Show on map</button></div></div>`).join('')}`}
+function pReport(){return `<div class="card"><h3>Report an issue</h3><label>Location</label><div class="mut">${S.pin?`Pin dropped. Ready to submit.`:'Click the map to drop a pin.'}</div>
+<label for="rc">Category</label><select id="rc">${['Poor lighting','Accident','Theft','Garbage','Harassment','Road damage'].map(c=>`<option>${c}</option>`).join('')}</select>
+<label for="rt">What happened?</label><textarea id="rt" rows="3" placeholder="Describe the issue in a sentence"></textarea>
+<label for="rp">Photo (optional)</label><input id="rp" type="file" accept="image/*"><div style="margin-top:12px"><button class="btn" data-a="submit">Submit report</button></div><div id="msg" class="mut" role="status"></div></div>
+<div class="card"><h3>Recent reports</h3>${[...R].reverse().map(r=>{const c=conf(r);return `<div style="padding:8px 0;border-bottom:1px solid var(--line)"><div class="row"><b>${r.cat}</b><span class="${c>=65?'ok':'mut'}">${c>=65?'Verified':'Unverified'} · ${c}%</span></div>${r.text}<div class="row"><span class="mut">${r.hrs<1?'Just now':r.hrs+'h ago'} · ${r.votes} upvotes</span><button class="chip" data-a="vote" data-v="${r.id}">Confirm</button></div></div>`}).join('')}</div>`}
+function pHome(){const a=P.map(p=>({p,s:sc(p)})),avg=Math.round(a.reduce((x,o)=>x+o.s.t,0)/a.length),ver=R.filter(r=>conf(r)>=65).length;
+ const best=c=>a.filter(o=>o.p.cat===c).sort((x,y)=>y.s.t-x.s.t)[0];
+ const F=[['Interactive map','Food, stays, sights and heritage sites with search and filters.'],['City Score','Safety, cleanliness, price, rating and access in one number.'],['Best vs. worst','Compare up to 3 places and see the top and bottom 5.'],['Safety layer','Risk zones built from citizen reports and known hotspots.'],['Safer routes','See the fastest and the safest path side by side.'],['Citizen reports','Drop a pin to report an issue. Confidence grows as others confirm.']];
+ const C=[...Object.entries(CITIES).map(([k,v])=>[k,v[0].split(' (')[0]])];
+ return `<section class="hero"><h1>City Life</h1><h2>Don't just find places. Know which ones are worth it and safe.</h2><p>One map for exploring food, stays, sights and heritage, with safety, cleanliness and price scores and a safer way to get there.</p>
+<div class="chips"><button class="btn" data-a="tab" data-v="explore">Start exploring</button><button class="btn alt" data-a="tab" data-v="route">Plan a safe route</button><button class="btn alt" data-a="tab" data-v="report">Report an issue</button></div></section>
+<div class="stats"><div class="stat"><b>${P.length}</b><span>Places in ${S.cname}</span></div><div class="stat"><b>${avg}</b><span>Average City Score</span></div><div class="stat"><b>${R.length}</b><span>Citizen reports</span></div><div class="stat"><b>${ver}</b><span>Verified reports</span></div></div>
+<div class="card"><h3>Choose a city</h3><p class="mut">Six cities of Maharashtra.</p><div class="chips" style="margin-top:8px">${C.map(c=>`<button class="chip ${S.city===c[0]?'on':''}" data-a="city" data-v="${c[0]}">${c[1]}</button>`).join('')}</div></div>
+<div class="feats">${F.map(x=>`<div class="card"><h3>${x[0]}</h3><p class="mut" style="margin:6px 0 0">${x[1]}</p></div>`).join('')}</div>
+<div class="card"><h3>How it works</h3><div class="steps"><div><b>1. Explore</b><p class="mut">Browse places on the map and open any one for its score and summary.</p></div><div><b>2. Compare</b><p class="mut">Put places side by side across safety, cleanliness, price, rating and access.</p></div><div><b>3. Stay safe</b><p class="mut">Check the safety layer, pick the safest route and report what you see.</p></div></div></div>
+<div class="card"><h3>Top pick in each category</h3><div style="display:grid;gap:6px;margin-top:8px">${Object.keys(CAT).map(c=>{const o=best(c);return o?`<div class="mut" style="margin-top:4px">${CAT[c][0]}</div>`+item(o.p,o.s.t):''}).join('')}</div></div>
+<p class="mut" style="text-align:center">Scores, risk zones and reports are sample data for this prototype. They are not real ratings or crime statistics.</p>`}
+function goRoute(f,t){S.from=f;S.to=t;S.res={fast:route(f,t,0),safe:route(f,t,1)};S.tab='route';draw()}
+const xy=e=>{const r=$('svg').getBoundingClientRect();return{x:+((e.clientX-r.left)/r.width*100).toFixed(1),y:+((e.clientY-r.top)/r.height*100).toFixed(1)}};
+const TABS=[['home','Home',pHome],['explore','Explore',pExplore],['compare','Compare',pCompare],['safety','Safety',pSafety],['route','Route',pRoute],['heritage','Heritage',pHeritage],['report','Report',pReport]];
+function draw(keep){const an=S.anim;S.anim=false;$('panel').classList.toggle('anim',an);$('map').classList.toggle('anim',an);document.querySelector('main').classList.toggle('landing',S.tab==='home');$('nav').innerHTML=TABS.map(t=>`<button class="${S.tab===t[0]?'on':''}" data-a="tab" data-v="${t[0]}">${t[1]}</button>`).join('');
+ $('map').innerHTML=mapSvg();$('legend').innerHTML=legend();const f=document.activeElement&&document.activeElement.id;
+ $('panel').innerHTML=TABS.find(t=>t[0]===S.tab)[2]();if(S.tab==='route'){$('from').value=S.from;$('to').value=S.to}
+ if(f==='q'){const q=$('q');q.focus();q.setSelectionRange(q.value.length,q.value.length)}}
+document.addEventListener('click',e=>{const m=e.target.closest('[data-id]');
+ if(m&&e.target.closest('#map')){const id=+m.dataset.id;if(S.tab==='compare')tog(id);else if(S.tab==='route'){S.from=S.to;S.to=id;S.res=null}else{S.sel=id;if(S.tab==='home')S.tab='explore'}draw();return}
+ if(S.tab==='report'&&e.target.closest('svg')){const sv=$('svg').getBoundingClientRect();S.pin={x:+((e.clientX-sv.left)/sv.width*100).toFixed(1),y:+((e.clientY-sv.top)/sv.height*100).toFixed(1)};const k=[$('rc').value,$('rt').value];draw();$('rc').value=k[0];$('rt').value=k[1];return}
+ const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,v=b.dataset.v;
+ if(a==='tab'){S.anim=true;S.tab=v;S.pin=null;if(v==='safety')S.heat=true;draw()}
+ else if(a==='cat'){S.cat=v;draw()}else if(a==='sel'){if(S.tab==='compare')tog(+v);else S.sel=+v;draw()}
+ else if(a==='cmp'){tog(+v);S.tab='compare';draw()}
+ else if(a==='routeto'){S.to=+v;S.res=null;S.tab='route';draw()}
+ else if(a==='go'){S.anim=true;S.from=+$('from').value;S.to=+$('to').value;S.res=S.from===S.to?null:{fast:route(S.from,S.to,0),safe:route(S.from,S.to,1)};draw()}
+ else if(a==='city'){setCity(v);S.tab='explore';S.anim=true;draw()}
+ else if(a==='vote'){R.find(r=>r.id==v).votes++;draw()}
+ else if(a==='submit'){const t=$('rt').value.trim();if(!S.pin){$('msg').textContent='Drop a pin on the map first.';return}if(t.length<8){$('msg').textContent='Add a short description (at least 8 characters).';return}
+  R.push({id:S.rid++,cat:$('rc').value,text:t,x:S.pin.x,y:S.pin.y,hrs:0,votes:0});S.pin=null;draw();$('msg').textContent='Report added. It becomes verified as nearby reports and confirmations grow.'}});
+document.addEventListener('change',e=>{if(e.target.dataset.a==='heat'){S.heat=e.target.checked;draw()}});
+document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value;draw()}});
+function tog(id){S.cmp=S.cmp.includes(id)?S.cmp.filter(x=>x!==id):[...S.cmp,id].slice(-3)}
+$('theme').onclick=()=>{const d=document.documentElement,dark=getComputedStyle(d).getPropertyValue('--bg').trim()==='#0e1a1f';d.setAttribute('data-theme',dark?'light':'dark')};
+const CITIES={
+pune:['Pune (Maharashtra)',[
+['Shaniwar Wada','heritage',40,45,[72,70,92,86,60],'18th-century Peshwa fortress with grand gates.',['history','fort']],
+['Aga Khan Palace','heritage',62,22,[84,86,85,87,70],'Palace and museum linked to the freedom movement.',['history','museum']],
+['Sinhagad Fort','heritage',14,86,[70,66,92,88,35],'Hill fort with sweeping views and a steep climb.',['trek','views']],
+['Dagdusheth Ganpati Temple','heritage',44,50,[68,64,98,92,60],'Famous Ganesh temple, very crowded on festival days.',['tradition','crowded']],
+['Pataleshwar Cave Temple','heritage',36,40,[78,74,97,78,65],'Rock-cut 8th-century temple in the middle of the city.',['history','free']],
+['Vaishali Restaurant','food',30,52,[76,82,70,90,75],'Classic South Indian breakfast spot on FC Road.',['breakfast','busy']],
+['Kayani Bakery','food',62,56,[80,84,85,88,70],'Old Irani bakery known for shrewsbury biscuits.',['bakery','budget']],
+['Osho Teerth Park','sight',72,34,[88,90,95,82,80],'Quiet landscaped park with a walking path.',['outdoor','quiet']],
+['Sheraton Grand Pune','stay',78,46,[92,94,30,91,92],'Premium hotel with 24x7 security.',['luxury','safe']]]],
+mumbai:['Mumbai (Maharashtra)',[
+['Gateway of India','heritage',46,86,[74,70,98,88,70],'Harbour-front arch and the starting point for ferries.',['history','crowded']],
+['Chhatrapati Shivaji Maharaj Terminus','heritage',52,74,[70,68,95,90,60],'Victorian Gothic railway terminus, UNESCO site.',['history','transit']],
+['Elephanta Caves','heritage',72,80,[80,76,80,84,40],'Rock-cut cave temples reached by ferry.',['ferry','history']],
+['Marine Drive','sight',34,64,[76,70,100,90,85],'Curving seafront promenade, best at sunset.',['free','walk']],
+['Haji Ali Dargah','heritage',32,54,[66,60,98,86,50],'Island dargah reached by a causeway at low tide.',['tradition','tide']],
+['Sanjay Gandhi National Park','sight',56,10,[78,80,88,86,55],'Large forest park inside the city with Kanheri Caves.',['nature','outdoor']],
+['Leopold Cafe','food',44,82,[72,68,60,84,75],'Colaba institution popular with visitors.',['busy','central']],
+['Britannia & Co.','food',54,78,[78,74,70,90,65],'Parsi cafe famous for berry pulao.',['local food','lunch']],
+['Juhu Beach','sight',18,26,[58,48,95,78,70],'Evening beach with street snacks. Crowded at weekends.',['beach','crowded']],
+['Taj Mahal Palace','stay',50,92,[94,96,22,94,92],'Heritage luxury hotel next to the Gateway.',['luxury','safe']]]],
+nashik:['Nashik (Maharashtra)',[
+['Trimbakeshwar Temple','heritage',10,48,[78,72,92,92,55],'Ancient Shiva temple near the source of the Godavari.',['tradition','pilgrimage']],
+['Pandavleni Caves','heritage',64,78,[80,76,95,84,35],'Buddhist caves on a hill with a stair climb.',['history','views']],
+['Ramkund','heritage',46,38,[70,60,98,86,70],'Holy bathing ghat on the Godavari.',['tradition','crowded']],
+['Kalaram Temple','heritage',44,32,[76,72,97,88,68],'Black-stone temple in Panchavati.',['tradition','free']],
+['Sula Vineyards','sight',26,74,[88,90,55,88,70],'Wine estate with tours and tastings.',['outdoor','tasting']],
+['Someshwar Waterfall','sight',28,18,[66,58,98,80,40],'Monsoon waterfall on the Godavari.',['nature','monsoon']],
+['Sadhana Misal','food',54,50,[76,74,92,90,70],'Spicy Nashik-style misal pav.',['budget','local food']],
+['Godavari Ghat Cafe (sample)','food',50,42,[74,78,85,76,72],'Tea and snacks near the river steps.',['snacks','quiet']],
+['Panchavati Guesthouse (sample)','stay',40,40,[78,80,88,80,65],'Simple guesthouse close to the temples.',['budget','central']]]],
+nagpur:['Nagpur (Maharashtra)',[
+['Deekshabhoomi','heritage',46,58,[86,88,98,92,85],'Large white stupa, a major Buddhist pilgrimage site.',['peaceful','free']],
+['Zero Mile Stone','heritage',50,42,[80,78,100,70,80],'Colonial marker for the centre of India.',['history','free']],
+['Sitabuldi Fort','heritage',54,36,[72,68,95,74,50],'Hilltop fort, opens on select days.',['history','views']],
+['Futala Lake','sight',28,38,[70,66,98,84,70],'Lake with an evening food street.',['evening','crowded']],
+['Ambazari Lake','sight',16,54,[82,80,95,80,72],'Lake and garden popular with families.',['outdoor','family']],
+['Raman Science Centre','sight',62,54,[88,90,85,85,90],'Interactive science museum, good for families.',['indoor','accessible']],
+['Saoji Bhojanalaya (sample)','food',44,68,[74,70,90,86,60],'Famously spicy Saoji mutton and chicken curries.',['spicy','local food']],
+['Tarri Poha Stall (sample)','food',40,46,[76,66,98,84,70],'Breakfast poha with spicy tarri gravy.',['budget','breakfast']],
+['Civil Lines Hotel (sample)','stay',60,28,[88,86,60,82,85],'Quiet mid-range stay in a leafy neighbourhood.',['quiet','clean']]]],
+sambhajinagar:['Chhatrapati Sambhajinagar (Maharashtra)',[
+['Ellora Caves','heritage',12,50,[84,82,90,95,60],'UNESCO rock-cut monasteries and the Kailasa temple.',['history','unesco']],
+['Daulatabad Fort','heritage',22,20,[78,72,90,90,35],'Hill fort with a dark stepped tunnel.',['fort','trek']],
+['Bibi Ka Maqbara','heritage',52,36,[80,78,92,86,75],'Mughal-era tomb often called the Taj of the Deccan.',['history','photo']],
+['Panchakki','heritage',46,52,[76,72,97,80,70],'Medieval water mill and garden.',['history','quiet']],
+['Siddharth Garden and Zoo','sight',54,58,[82,80,96,78,75],'City garden with a small zoo.',['family','outdoor']],
+['Himayat Bagh','sight',62,46,[78,74,98,74,70],'Large green park on the city edge.',['outdoor','free']],
+['Tikka and Naan Kabab (sample)','food',44,62,[74,70,72,84,70],'Local grill known for its kebabs.',['non-veg','evening']],
+['Kulfi Corner (sample)','food',50,48,[76,72,95,80,72],'Evening kulfi and cold drinks.',['dessert','budget']],
+['Station Road Lodge (sample)','stay',60,64,[64,62,90,70,80],'Budget rooms near the railway station.',['budget','noisy']]]],
+kolhapur:['Kolhapur (Maharashtra)',[
+['Mahalaxmi Temple','heritage',44,50,[74,70,97,92,60],'Ancient temple and a major Shakti peeth.',['tradition','crowded']],
+['New Palace Museum','heritage',50,36,[86,86,90,86,70],'Palace museum with royal artefacts and a wrestling arena.',['history','museum']],
+['Panhala Fort','heritage',20,14,[76,72,92,86,35],'Massive hill fort tied to Maratha history.',['fort','views']],
+['Jyotiba Temple','heritage',30,22,[72,68,95,88,40],'Hilltop temple that draws large crowds in spring.',['pilgrimage','crowded']],
+['Rankala Lake','sight',36,66,[80,74,98,84,80],'Lake promenade with evening snack stalls.',['evening','free']],
+['Khasbag Maidan','sight',58,34,[84,80,98,80,75],'Historic wrestling ground.',['sport','free']],
+['Kolhapuri Misal House (sample)','food',54,56,[76,72,90,88,70],'Fiery kolhapuri misal and cold kokum.',['spicy','budget']],
+['Tambda Rassa Stall (sample)','food',62,44,[72,66,85,86,65],'Famous red mutton rassa, a Kolhapur speciality.',['non-veg','local food']],
+['Heritage Palace Hotel (sample)','stay',32,70,[90,90,45,90,70],'Palace-style stay with gardens.',['heritage','quiet']]]]};
+const CACHE={};
+function build(k){if(CACHE[k])return CACHE[k];const d=CITIES[k],pp=d[1].map((a,i)=>({id:i+1,name:a[0],cat:a[1],x:a[2],y:a[3],b:{s:a[4][0],c:a[4][1],a:a[4][2],r:a[4][3],x:a[4][4]},blurb:a[5],tags:a[6]}));
+ const ed=new Set(),inT=[0];while(inT.length<pp.length){let bd=1e9,bp;inT.forEach(i=>pp.forEach((q,j)=>{if(!inT.includes(j)&&dist(pp[i],q)<bd){bd=dist(pp[i],q);bp=[i,j]}}));ed.add(bp[0]+','+bp[1]);inT.push(bp[1])}
+ pp.forEach((p,i)=>{pp.map((q,j)=>j).filter(j=>j!==i).sort((a,b)=>dist(p,pp[a])-dist(p,pp[b])).slice(0,2).forEach(o=>ed.add(Math.min(i,o)+','+Math.max(i,o)))});
+ const mid=(a,b)=>({x:(pp[a].x+pp[b].x)/2,y:(pp[a].y+pp[b].y)/2});const m1=mid(1,2),m2=mid(5,6);
+ return CACHE[k]={name:d[0].split(' (')[0],P:pp,E:[...ed].map(e=>e.split(',').map(n=>+n+1)),home:[50,56],
+  Z:[{...m1,r:12,w:.7,n:'Sample risk zone A',why:'Illustrative: poor lighting reports'},{...m2,r:12,w:.8,n:'Sample risk zone B',why:'Illustrative: crowding and theft reports'}],
+  R:[{id:1,cat:'Poor lighting',text:'Sample report: streetlights out on this stretch.',x:m1.x,y:m1.y,hrs:4,votes:5},{id:2,cat:'Theft',text:'Sample report: phone snatching near the crowded junction.',x:m2.x,y:m2.y,hrs:12,votes:3},{id:3,cat:'Garbage',text:'Sample report: overflowing bins near the market.',x:pp[3].x,y:pp[3].y+3,hrs:26,votes:2}]}}
+const DEMO={name:'Demo City',P,E,Z,R,home:[36,52]};
+function setCity(k){const c=k==='demo'?DEMO:build(k);S.city=k;S.cname=c.name;P=c.P;E=c.E;Z=c.Z;R=c.R;$('city').value=k;
+ Object.assign(S,{anim:true,sel:null,cmp:[P[0].id,P[1].id],from:P[0].id,to:P[2].id,res:null,tab:'home',q:'',cat:'all',pin:null,rid:100});
+ $('cnote').textContent=k==='demo'?'Sample data for the MVP.':'Real landmarks with illustrative scores and reports. Not real ratings or crime data.';draw()}
+$('city').innerHTML=Object.keys(CITIES).map(k=>`<option value="${k}">${CITIES[k][0]}</option>`).join('');
+$('city').onchange=e=>setCity(e.target.value);
+
+setCity('pune');
+</script></body></html>
